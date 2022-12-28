@@ -1,0 +1,114 @@
+## mako
+<%page expression_filter="h"/>
+<%! from django.utils.translation import ugettext as _ %>
+    <%namespace name='static' file='static_content.html'/>
+<%inherit file="main.html" />
+<%block name="pagetitle">${_("Partners")}</%block>
+
+<style>
+  .header-page{
+        text-align: center;
+  }
+    .header-page-img {
+      max-height: 400px;
+      width: auto;
+    }
+
+    .partner-name {
+        font-weight: 700;
+        text-transform: capitalize;
+        margin-bottom: 15px;
+        color: #2e3d49;
+    }
+
+    .partner-profile .section {
+        padding: 1rem;
+        border-bottom: 1px solid #e4e4e4;
+        line-height: 2rem;
+
+    }
+
+    @media (min-width: 768px)
+        .partner-profile .partner-logo {
+            margin-top: -100px;
+        }
+
+        .partner-profile .partner-logo {
+            width: 150px;
+            height: 150px;
+            border: 2px solid #f8f8f8;
+            text-align: center;
+            padding: 10px;
+            border-radius: 3px;
+            background: #fff;
+            margin-top: -120px;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .partner-profile .partner-logo img {
+            max-height: 100%;
+            max-width: 100%;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+</style>
+<%block name="content">
+    <section class="page partner-profile">
+        <header class="header-page">
+            <img class="header-page-img" src="../../media/${organization.banner}">
+        </header>
+
+        <section class="find-courses">
+
+            <section class="courses-container">
+                <section class="section about-partner">
+                    <div class="partner-logo">
+                        <img src="../../media/${organization.logo}" alt="${organization.name}">
+                    </div>
+                    <h2 class="partner-name"> ${organization.name}</h2>
+                    <p>
+                        ${organization.description | n}
+                    </p>
+                    <p>
+                        <a href="${organization.url}" target="_blank">
+                            <i class="fa fa-globe "></i>
+                            <em>${organization.url}</em>
+                        </a>
+                    </p>
+                </section>
+                <div class="courses no-course-discovery">
+                    <ul class="courses-listing">
+                        % for course in courses:
+                            <li class="courses-listing-item">
+                                <article class="course" id="${course.display_name}">
+                                    <a href="https://${lms_url}/courses/${course.id}/about">
+                                        <header class="course-image">
+                                            <div class="cover-image">
+                                                <img src="${course.course_image_url}"/>
+                                                <div class="learn-more" aria-hidden="true">Learn more</div>
+                                            </div>
+                                        </header>
+                                        <div class="course-info">
+                                            <h2 class="course-name">
+                                                <span class="course-organization">${course.org}</span>
+                                                <span class="course-code">${course.display_number_with_default}</span>
+                                                <span class="course-title">${course.display_name}</span>
+                                            </h2>
+                                        </div>
+
+                                    </a>
+                                </article>
+                            </li>
+                        % endfor
+                    </ul>
+                </div>
+
+            </section>
+
+        </section>
+    </section>
+
+</%block>

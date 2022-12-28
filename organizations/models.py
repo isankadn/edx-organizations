@@ -36,8 +36,14 @@ class Organization(TimeStampedModel):
         null=True, blank=True, max_length=255
     )
     active = models.BooleanField(default=True)
+    display_in_home_page = models.BooleanField(default=True)
 
-    history = HistoricalRecords()
+    banner = models.ImageField(
+        upload_to='organization_banners',
+        help_text=_('Please add (Height 315px Width 1140px) JPG PNG files for banner images. Optimize your image before it uploads'),
+        null=True, blank=True, max_length=255
+    )
+    url = models.CharField(max_length=255, db_index=True)
 
     def __str__(self):
         return f"{self.name} ({self.short_name})"
