@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='organization',
             name='url',
-            field=models.CharField(db_index=True, default='https://github.com/', max_length=255),
+            field=models.CharField(db_index=True, default='https://example.com/', max_length=255),
             preserve_default=False,
         ),
         migrations.DeleteModel(
