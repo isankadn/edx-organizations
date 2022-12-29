@@ -1,5 +1,8 @@
 include LICENSE
 include README.rst
+recursive-include organizations/templates *.html *.underscore
+recursive-include organizations/locale *.po
+recursive-include organizations/locale *.mo
 graft organizations
 recursive-include requirements *.in *.txt
 global-exclude *.pyc
