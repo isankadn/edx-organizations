@@ -23,7 +23,11 @@ class OrganizationDetailViewSet(TemplateView):
 
     def get_context_data(self, **kwargs):
         course_overviews = []
-        courses = OrganizationCourse.objects.filter(organization_id=self.kwargs['pk'], active=1)
+        org = Organization.objects.get(short_name=self.kwargs['short_name'])
+        if org:
+            courses = OrganizationCourse.objects.filter(organization_id=org.id, active=1)
+        else:
+            courses = []
 
         for course in courses:
             course_key = CourseKey.from_string(course.course_id)
@@ -35,6 +39,6 @@ class OrganizationDetailViewSet(TemplateView):
 
         context['courses'] = course_overviews
         context['lms_url'] = settings.SITE_NAME
-        context['organization'] = get_object_or_404(Organization, id=self.kwargs['pk'])
+        context['organization'] = get_object_or_404(Organization, short_name=self.kwargs['short_name'])
 
         return context
