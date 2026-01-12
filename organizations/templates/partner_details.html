@@ -1,6 +1,9 @@
 ## mako
 <%page expression_filter="h"/>
-<%! from django.utils.translation import ugettext as _ %>
+<%!
+from django.utils.translation import ugettext as _
+from django.utils import timezone
+%>
     <%namespace name='static' file='static_content.html'/>
 <%inherit file="main.html" />
 <%block name="pagetitle">${_("Partners")}</%block>
@@ -28,11 +31,6 @@
 
     }
 
-    @media (min-width: 768px)
-        .partner-profile .partner-logo {
-            margin-top: -100px;
-        }
-
         .partner-profile .partner-logo {
             width: 150px;
             height: 150px;
@@ -46,6 +44,12 @@
             margin-bottom: 15px;
         }
 
+    @media (min-width: 768px) {
+        .partner-profile .partner-logo {
+            margin-top: -100px;
+        }
+    }
+
         .partner-profile .partner-logo img {
             max-height: 100%;
             max-width: 100%;
@@ -53,6 +57,38 @@
             top: 50%;
             transform: translateY(-50%);
         }
+
+    /* Course status label (match themed course card behavior) */
+    .find-courses .courses .course .cover-image {
+        position: relative;
+    }
+    .find-courses .courses .course .status {
+        background: #0069B4;
+        color: white;
+        font-size: 10px;
+        left: 10px;
+        padding: 2px 10px;
+        border-radius: 2px;
+        position: absolute;
+        top: -6px;
+        z-index: 2;
+    }
+    .find-courses .courses .course .status::after {
+        border-bottom: 6px solid #00355a;
+        border-right: 6px solid transparent;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+        right: -6px;
+        top: 0;
+        width: 0;
+    }
+    /* Only background changes per status */
+    .find-courses .courses .course .status.invitations_only { background: #0069B4; }
+    .find-courses .courses .course .status.future { background: #67bb89 !important; }
+    .find-courses .courses .course .status.ongoing { background: #188038; }
+    .find-courses .courses .course .status.finished { background: #e83f40 !important; }
 
 </style>
 <%block name="content">
@@ -82,11 +118,46 @@
                 <div class="courses no-course-discovery">
                     <ul class="courses-listing">
                         % for course in courses:
+                            <%
+                                now = timezone.now()
+                                if course.start is not None and course.start < now and course.end is not None and course.end < now:
+                                    status = _("Finalized")
+                                    status_code = "finished"
+                                elif course.start is not None and course.start > now and course.invitation_only == False:
+                                    status = _("Open for Enrollment")
+                                    status_code = "future"
+                                elif course.start is not None and course.start > now and course.invitation_only == True:
+                                    status = _("By Invitation")
+                                    status_code = "invitations_only"
+                                elif (
+                                    course.start is not None and
+                                    (
+                                        (course.start < now and course.end is None) or
+                                        (course.start < now and course.end is not None and course.end > now)
+                                    ) and
+                                    course.invitation_only == True
+                                ):
+                                    status = _("By Invitation")
+                                    status_code = "invitations_only"
+                                elif (
+                                    course.start is not None and
+                                    (
+                                        (course.start < now and course.end is None) or
+                                        (course.start < now and course.end is not None and course.end > now)
+                                    )
+                                ):
+                                    status = _("Ongoing")
+                                    status_code = "ongoing"
+                                else:
+                                    status = _("Ongoing")
+                                    status_code = "ongoing"
+                            %>
                             <li class="courses-listing-item">
                                 <article class="course" id="${course.display_name}">
                                     <a href="https://${lms_url}/courses/${course.id}/about">
                                         <header class="course-image">
                                             <div class="cover-image">
+                                                <div class="status ${status_code}">${status}</div>
                                                 <img src="${course.course_image_url}"/>
                                                 <div class="learn-more" aria-hidden="true">Learn more</div>
                                             </div>
